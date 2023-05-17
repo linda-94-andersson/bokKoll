@@ -1,13 +1,16 @@
+import React from "react";
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+import Results from './components/Results';
 
 export default function App() {
-  const [input, setInput] = useState(); 
+  const [input, setInput] = useState();
   return (
     <View style={styles.container}>
       <Text>Välkommstmeddlande här!</Text>
       <TextInput style={styles.input} onChangeText={setInput} value={input} placeholder='Sök efter bok eller författare...'></TextInput>
+      <Results input={input} />
       <StatusBar style="auto" />
     </View>
   );
