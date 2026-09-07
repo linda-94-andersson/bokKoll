@@ -1,13 +1,14 @@
-import React from "react";
 import { View, Text } from "react-native";
 
-const Results = ({ input }) => {
+type ResultsProps = {
+  readonly input: string;
+};
+
+export default function Results({ input }: ResultsProps) {
   return (
     <View>
       <Text>Results here!</Text>
       <Text>{input}</Text>
     </View>
   );
-};
-
-export default Results;
+}
