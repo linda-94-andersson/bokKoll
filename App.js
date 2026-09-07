@@ -2,8 +2,11 @@ import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import Results from './components/Results';
+import db from './database/database';
 
 export default function App() {
+  console.log('Database:', db);
+
   const [input, setInput] = useState("");
   return (
     <View style={styles.container}>
