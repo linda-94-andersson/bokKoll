@@ -13,6 +13,7 @@ import {
 import { addBook, getBookByISBN, getBooks } from "../../database/database";
 import { normalizeISBN, isValidISBN } from "../../utils/isbn";
 import type { Book, NewBook } from "../../types/Book";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 type AddBookProps = {
   readonly setBooks: Dispatch<SetStateAction<Book[]>>;
@@ -24,30 +25,31 @@ export default function AddBook({ setBooks, onClose }: AddBookProps) {
   const [author, setAuthor] = useState<string>("");
   const [isbn, setIsbn] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  const { t } = useLanguage();
 
   const onAddBook = (): void => {
     const cleanTitle = title.trim();
     const cleanISBN = normalizeISBN(isbn);
 
     if (!cleanTitle) {
-      setMessage("Du måste ange en titel.");
+      setMessage(t.addBook.titleRequired);
       return;
     }
 
     if (!cleanISBN) {
-      setMessage("Du måste ange ett ISBN.");
+      setMessage(t.addBook.isbnRequired);
       return;
     }
 
     if (!isValidISBN(cleanISBN)) {
-      setMessage("ISBN-numret är inte giltigt.");
+      setMessage(t.addBook.invalidIsbn);
       return;
     }
 
     const existingBook = getBookByISBN(cleanISBN);
 
     if (existingBook) {
-      setMessage("Den här boken finns redan i ditt bibliotek.");
+      setMessage(t.addBook.alreadyExists);
       return;
     }
 
@@ -85,40 +87,40 @@ export default function AddBook({ setBooks, onClose }: AddBookProps) {
             onPress={(event) => event.stopPropagation()}
           >
             <View style={styles.header}>
-              <Text style={styles.heading}>Lägg till bok</Text>
+              <Text style={styles.heading}>{t.addBook.title}</Text>
 
               <Pressable
                 style={styles.closeButton}
                 onPress={onClose}
                 accessibilityRole="button"
-                accessibilityLabel="Stäng"
+                accessibilityLabel={t.addBook.close}
               >
                 <Text style={styles.closeButtonText}>×</Text>
               </Pressable>
             </View>
 
-            <Text style={styles.label}>Titel</Text>
+            <Text style={styles.label}>{t.addBook.bookTitle}</Text>
             <TextInput
               style={styles.input}
-              placeholder="T.ex. Harry Potter och de vises sten"
+              placeholder={t.addBook.titlePlaceholder}
               placeholderTextColor="#999"
               value={title}
               onChangeText={setTitle}
             />
 
-            <Text style={styles.label}>Författare</Text>
+            <Text style={styles.label}>{t.addBook.author}</Text>
             <TextInput
               style={styles.input}
-              placeholder="T.ex. J.K. Rowling"
+              placeholder={t.addBook.authorPlaceholder}
               placeholderTextColor="#999"
               value={author}
               onChangeText={setAuthor}
             />
 
-            <Text style={styles.label}>ISBN</Text>
+            <Text style={styles.label}>{t.addBook.isbn}</Text>
             <TextInput
               style={styles.input}
-              placeholder="978..."
+              placeholder={t.addBook.isbnPlaceholder}
               placeholderTextColor="#999"
               value={isbn}
               onChangeText={setIsbn}
@@ -128,7 +130,7 @@ export default function AddBook({ setBooks, onClose }: AddBookProps) {
             {Boolean(message) && <Text style={styles.message}>{message}</Text>}
 
             <Pressable style={styles.saveButton} onPress={onAddBook}>
-              <Text style={styles.saveButtonText}>Spara bok</Text>
+              <Text style={styles.saveButtonText}>{t.addBook.save}</Text>
             </Pressable>
           </Pressable>
         </KeyboardAvoidingView>

@@ -14,6 +14,7 @@ import {
 import { getBookByISBN, getBooks, updateBook } from "../../database/database";
 import { isValidISBN, normalizeISBN } from "../../utils/isbn";
 import type { Book } from "../../types/Book";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 type EditBookProps = {
   readonly book: Book;
@@ -32,48 +33,45 @@ export default function EditBook({
   const [author, setAuthor] = useState<string>(book.author ?? "");
   const [isbn, setIsbn] = useState<string>(book.isbn);
   const [message, setMessage] = useState<string>("");
+  const { t } = useLanguage();
 
   const onSave = (): void => {
     const cleanTitle = title.trim();
     const cleanISBN = normalizeISBN(isbn);
 
     if (!cleanTitle) {
-      setMessage("Du måste ange en titel.");
+      setMessage(t.editBook.titleRequired);
       return;
     }
 
     if (!cleanISBN) {
-      setMessage("Du måste ange ett ISBN.");
+      setMessage(t.editBook.isbnRequired);
       return;
     }
 
     if (!isValidISBN(cleanISBN)) {
-      setMessage("ISBN-numret är inte giltigt.");
+      setMessage(t.editBook.invalidIsbn);
       return;
     }
 
     const existingBook = getBookByISBN(cleanISBN);
 
     if (existingBook !== null && existingBook.id !== book.id) {
-      setMessage("En annan bok med det här ISBN-numret finns redan.");
+      setMessage(t.editBook.duplicateIsbn);
       return;
     }
 
     if (cleanISBN !== book.isbn) {
-      Alert.alert(
-        "Ändra ISBN?",
-        "ISBN används för att identifiera boken i ditt bibliotek. Är du säker på att du vill ändra ISBN-numret?",
-        [
-          {
-            text: "Avbryt",
-            style: "cancel",
-          },
-          {
-            text: "Ändra ISBN",
-            onPress: () => saveBook(cleanTitle, cleanISBN),
-          },
-        ],
-      );
+      Alert.alert(t.editBook.changeIsbnTitle, t.editBook.changeIsbnMessage, [
+        {
+          text: t.editBook.cancel,
+          style: "cancel",
+        },
+        {
+          text: t.editBook.changeIsbn,
+          onPress: () => saveBook(cleanTitle, cleanISBN),
+        },
+      ]);
 
       return;
     }
@@ -125,45 +123,45 @@ export default function EditBook({
             onPress={(event) => event.stopPropagation()}
           >
             <View style={styles.header}>
-              <Text style={styles.heading}>Redigera bok</Text>
+              <Text style={styles.heading}>{t.editBook.title}</Text>
 
               <Pressable
                 style={styles.closeButton}
                 onPress={onClose}
                 accessibilityRole="button"
-                accessibilityLabel="Stäng"
+                accessibilityLabel={t.editBook.close}
               >
                 <Text style={styles.closeButtonText}>×</Text>
               </Pressable>
             </View>
 
-            <Text style={styles.label}>Titel</Text>
+            <Text style={styles.label}>{t.editBook.title}</Text>
 
             <TextInput
               style={styles.input}
-              placeholder="Titel"
+              placeholder={t.editBook.bookTitle}
               placeholderTextColor="#999"
               value={title}
               onChangeText={setTitle}
               autoCapitalize="sentences"
             />
 
-            <Text style={styles.label}>Författare</Text>
+            <Text style={styles.label}>{t.editBook.author}</Text>
 
             <TextInput
               style={styles.input}
-              placeholder="Författare"
+              placeholder={t.editBook.author}
               placeholderTextColor="#999"
               value={author}
               onChangeText={setAuthor}
               autoCapitalize="words"
             />
 
-            <Text style={styles.label}>ISBN</Text>
+            <Text style={styles.label}>{t.editBook.isbn}</Text>
 
             <TextInput
               style={styles.input}
-              placeholder="978..."
+              placeholder={t.addBook.isbnPlaceholder}
               placeholderTextColor="#999"
               value={isbn}
               onChangeText={setIsbn}
@@ -173,7 +171,7 @@ export default function EditBook({
             {Boolean(message) && <Text style={styles.message}>{message}</Text>}
 
             <Pressable style={styles.saveButton} onPress={onSave}>
-              <Text style={styles.saveButtonText}>Spara ändringar</Text>
+              <Text style={styles.saveButtonText}>{t.editBook.save}</Text>
             </Pressable>
           </Pressable>
         </KeyboardAvoidingView>

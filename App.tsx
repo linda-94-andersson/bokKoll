@@ -20,22 +20,24 @@ import AddBook from "./src/components/AddBook/AddBook";
 import BookList from "./src/components/BookList/BookList";
 import BookDetails from "./src/components/BookDetails/BookDetails";
 import EditBook from "./src/components/EditBook/EditBook";
+import Settings from "./src/components/Settings/Settings";
 import type { Book } from "./src/types/Book";
+import { LanguageProvider, useLanguage } from "./src/i18n/LanguageContext";
 
-export default function App() {
+function AppContent() {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isAddBookVisible, setIsAddBookVisible] = useState(false);
   const [isEditBookVisible, setIsEditBookVisible] = useState(false);
+  const [isSettingsVisible, setIsSettingsVisible] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     initializeDatabase();
 
     const booksFromDatabase = getBooks();
     setBooks(booksFromDatabase);
-
-    console.log("Books loaded:", booksFromDatabase);
   }, []);
 
   const filteredBooks = books.filter((book) => {
@@ -80,7 +82,7 @@ export default function App() {
         <>
           <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.header}>
-              <Text style={styles.heading}>Mina böcker</Text>
+              <Text style={styles.heading}>{t.home.title}</Text>
 
               <Pressable
                 style={styles.addButton}
@@ -89,6 +91,16 @@ export default function App() {
                 }}
               >
                 <Text style={styles.addButtonText}>+</Text>
+              </Pressable>
+              <Pressable
+                style={styles.settingsButton}
+                onPress={() => {
+                  setIsSettingsVisible(true);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t.home.settings}
+              >
+                <Text style={styles.settingsButtonText}>⚙</Text>
               </Pressable>
             </View>
 
@@ -99,7 +111,7 @@ export default function App() {
 
               <TextInput
                 style={styles.searchInput}
-                placeholder="Sök titel, författare eller ISBN"
+                placeholder={t.home.searchPlaceholder}
                 placeholderTextColor="#999"
                 value={searchTerm}
                 onChangeText={setSearchTerm}
@@ -110,7 +122,7 @@ export default function App() {
                   style={styles.clearButton}
                   onPress={() => setSearchTerm("")}
                   accessibilityRole="button"
-                  accessibilityLabel="Rensa sökning"
+                  accessibilityLabel={t.home.clearSearch}
                 >
                   <Text style={styles.clearButtonText}>×</Text>
                 </Pressable>
@@ -153,9 +165,28 @@ export default function App() {
               }}
             />
           )}
+
+          {isSettingsVisible && (
+            <Settings onClose={() => setIsSettingsVisible(false)} />
+          )}
+
+          {isAddBookVisible && (
+            <AddBook
+              setBooks={setBooks}
+              onClose={() => setIsAddBookVisible(false)}
+            />
+          )}
         </>
       </SafeAreaView>
     </ErrorBoundary>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }
 
@@ -241,5 +272,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 26,
     color: "#888",
+  },
+
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  settingsButton: {
+    width: 45,
+    height: 45,
+    borderRadius: 23,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EFEFEF",
+    marginLeft: -115,
+  },
+
+  settingsButtonText: {
+    fontSize: 22,
+    color: "#333",
   },
 });

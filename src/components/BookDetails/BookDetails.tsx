@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import BookCover from "../BookCover/BookCover";
 import type { Book } from "../../types/Book";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 type BookDetailsProps = {
   readonly book: Book;
@@ -17,10 +18,11 @@ export default function BookDetails({
   onToggleRead,
   onEdit,
 }: BookDetailsProps) {
+  const { t } = useLanguage();
   return (
     <View style={styles.container}>
       <Pressable style={styles.backButton} onPress={onBack}>
-        <Text style={styles.backText}>← Tillbaka</Text>
+        <Text style={styles.backText}>{t.bookDetails.back}</Text>
       </Pressable>
 
       <View style={styles.coverContainer}>
@@ -37,27 +39,31 @@ export default function BookDetails({
           />
 
           <Text style={styles.statusText}>
-            {book.isRead ? "Läst" : "Oläst"}
+            {book.isRead ? t.books.read : t.books.unread}
           </Text>
         </View>
 
         <Text style={styles.title}>{book.title}</Text>
 
-        <Text style={styles.author}>{book.author ?? "Okänd författare"}</Text>
+        <Text style={styles.author}>
+          {book.author ?? t.books.unknownAuthor}
+        </Text>
       </View>
 
       <View style={styles.infoCard}>
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>ISBN</Text>
+          <Text style={styles.infoLabel}>{t.bookDetails.isbn}</Text>
           <Text style={styles.infoValue}>{book.isbn}</Text>
         </View>
 
         <View style={styles.divider} />
 
         <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Status</Text>
+          <Text style={styles.infoLabel}>{t.bookDetails.status}</Text>
           <Text style={styles.infoValue}>
-            {book.status === "owned" ? "Äger" : "Önskelista"}
+            {book.status === "owned"
+              ? t.bookDetails.owned
+              : t.bookDetails.wishlist}
           </Text>
         </View>
 
@@ -66,7 +72,7 @@ export default function BookDetails({
             <View style={styles.divider} />
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Utgiven</Text>
+              <Text style={styles.infoLabel}>{t.bookDetails.published}</Text>
 
               <Text style={styles.infoValue}>{book.publishedYear}</Text>
             </View>
@@ -76,7 +82,7 @@ export default function BookDetails({
 
       {book.description !== null && (
         <View style={styles.descriptionSection}>
-          <Text style={styles.sectionTitle}>Om boken</Text>
+          <Text style={styles.sectionTitle}>{t.bookDetails.about}</Text>
 
           <Text style={styles.description}>{book.description}</Text>
         </View>
@@ -84,19 +90,21 @@ export default function BookDetails({
 
       <View style={styles.actions}>
         <Pressable style={styles.secondaryButton} onPress={() => onEdit(book)}>
-          <Text style={styles.secondaryButtonText}>Redigera bok</Text>
+          <Text style={styles.secondaryButtonText}>{t.bookDetails.edit}</Text>
         </Pressable>
         <Pressable
           style={styles.primaryButton}
           onPress={() => onToggleRead(book)}
         >
           <Text style={styles.primaryButtonText}>
-            {book.isRead ? "Markera som oläst" : "Markera som läst"}
+            {book.isRead
+              ? t.bookDetails.markAsUnread
+              : t.bookDetails.markAsRead}
           </Text>
         </Pressable>
 
         <Pressable style={styles.deleteButton} onPress={() => onDelete(book)}>
-          <Text style={styles.deleteButtonText}>Ta bort bok</Text>
+          <Text style={styles.deleteButtonText}>{t.bookDetails.delete}</Text>
         </Pressable>
       </View>
     </View>

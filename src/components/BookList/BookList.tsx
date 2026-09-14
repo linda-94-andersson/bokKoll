@@ -8,6 +8,7 @@ import {
 } from "../../database/database";
 import BookCover from "../BookCover/BookCover";
 import type { Book } from "../../types/Book";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 type BookListProps = {
   readonly books: Book[];
@@ -25,6 +26,7 @@ export default function BookList({
   onEditBook,
 }: BookListProps) {
   const [expandedBookId, setExpandedBookId] = useState<number | null>(null);
+  const { t } = useLanguage();
 
   const handleToggleRead = (book: Book): void => {
     updateBookReadStatus(book.id, !book.isRead);
@@ -40,13 +42,11 @@ export default function BookList({
     return (
       <View style={styles.emptyState}>
         <Text style={styles.emptyTitle}>
-          {isSearching ? "Inga träffar" : "Inga böcker ännu"}
+          {isSearching ? t.books.noResults : t.books.noBooks}
         </Text>
 
         <Text style={styles.emptyText}>
-          {isSearching
-            ? "Prova att söka efter en annan titel, författare eller ISBN."
-            : "Tryck på + för att lägga till din första bok."}
+          {isSearching ? t.books.noResultsText : t.books.noBooksText}
         </Text>
       </View>
     );
@@ -70,10 +70,12 @@ export default function BookList({
                 </Text>
 
                 <Text style={styles.author}>
-                  {book.author ?? "Okänd författare"}
+                  {book.author ?? t.books.unknownAuthor}
                 </Text>
 
-                <Text style={styles.isbn}>ISBN {book.isbn}</Text>
+                <Text style={styles.isbn}>
+                  {t.bookDetails.isbn} {book.isbn}
+                </Text>
               </View>
 
               <View style={styles.statusContainer}>
@@ -85,7 +87,7 @@ export default function BookList({
                 />
 
                 <Text style={styles.statusText}>
-                  {book.isRead ? "Läst" : "Oläst"}
+                  {book.isRead ? t.books.read : t.books.unread}
                 </Text>
               </View>
             </Pressable>
@@ -96,7 +98,7 @@ export default function BookList({
                 onPress={() => handleToggleRead(book)}
               >
                 <Text style={styles.actionText}>
-                  {book.isRead ? "Markera oläst" : "Markera läst"}
+                  {book.isRead ? t.books.markAsUnread : t.books.markAsRead}
                 </Text>
               </Pressable>
 
@@ -106,14 +108,14 @@ export default function BookList({
                     style={styles.editButton}
                     onPress={() => onEditBook(book)}
                   >
-                    <Text style={styles.editText}>Redigera</Text>
+                    <Text style={styles.editText}>{t.books.edit}</Text>
                   </Pressable>
 
                   <Pressable
                     style={styles.deleteButton}
                     onPress={() => handleDelete(book)}
                   >
-                    <Text style={styles.deleteText}>Ta bort</Text>
+                    <Text style={styles.deleteText}>{t.books.delete}</Text>
                   </Pressable>
                 </>
               )}
@@ -122,7 +124,7 @@ export default function BookList({
                 onPress={() => setExpandedBookId(isExpanded ? null : book.id)}
               >
                 <Text style={styles.actionText}>
-                  {isExpanded ? "Mindre" : "Mer"}
+                  {isExpanded ? t.books.less : t.books.more}
                 </Text>
               </Pressable>
             </View>
