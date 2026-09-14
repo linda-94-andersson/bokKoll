@@ -114,4 +114,48 @@ export function deleteBook(id: number): void {
   db.runSync("DELETE FROM books WHERE id = ?", [id]);
 }
 
+export function updateBookReadStatus(id: number, isRead: boolean): void {
+  db.runSync("UPDATE books SET isRead = ? WHERE id = ?", [isRead ? 1 : 0, id]);
+}
+
+export function searchBooks(searchTerm: string): Book[] {
+  const term = `%${searchTerm.trim()}%`;
+
+  const rows = db.getAllSync<{
+    id: number;
+    isbn: string;
+    title: string;
+    author: string | null;
+    coverUrl: string | null;
+    description: string | null;
+    publishedYear: number | null;
+    status: string;
+    isRead: number;
+    createdAt: string;
+  }>(
+    `SELECT *
+     FROM books
+     WHERE title LIKE ?
+        OR author LIKE ?
+        OR isbn LIKE ?
+     ORDER BY id DESC`,
+    [term, term, term],
+  );
+
+  return rows.map(
+    (row): Book => ({
+      id: row.id,
+      isbn: row.isbn,
+      title: row.title,
+      author: row.author,
+      coverUrl: row.coverUrl,
+      description: row.description,
+      publishedYear: row.publishedYear,
+      status: row.status as BookStatus,
+      isRead: row.isRead === 1,
+      createdAt: row.createdAt,
+    }),
+  );
+}
+
 export default db;

@@ -2,20 +2,21 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import {
-  initializeDatabase,
-  getBooks,
-  getBookByISBN,
   deleteBook,
+  getBooks,
+  initializeDatabase,
+  updateBookReadStatus,
 } from "./src/database/database";
-import { fetchBookFromGoogle } from "./src/services/googleBooks";
 import ErrorBoundary from "./src/components/ErrorBoundary/ErrorBoundary";
-import Results from "./src/components/Results/Results";
 import AddBook from "./src/components/AddBook/AddBook";
 import BookList from "./src/components/BookList/BookList";
+import BookDetails from "./src/components/BookDetails/BookDetails";
+import type { Book } from "./src/types/Book";
 
 export default function App() {
-  const [input, setInput] = useState<string>("");
-  const [books, setBooks] = useState<ReturnType<typeof getBooks>>([]);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
   useEffect(() => {
     initializeDatabase();
@@ -24,41 +25,65 @@ export default function App() {
     setBooks(booksFromDatabase);
 
     console.log("Books loaded:", booksFromDatabase);
-
-    const book = getBookByISBN("9781234567890");
-
-    console.log("Book found by ISBN:", book);
-
-    console.log("deleteBook function:", deleteBook);
-
-    const testGoogleBooks = async (): Promise<void> => {
-      try {
-        const book = await fetchBookFromGoogle("9780140328721");
-
-        console.log("Google Books:", book);
-      } catch (error: unknown) {
-        console.error("Kunde inte hämta boken:", error);
-      }
-    };
-
-    void testGoogleBooks();
   }, []);
+
+  const filteredBooks = books.filter((book) => {
+    const term = searchTerm.trim().toLowerCase();
+
+    if (!term) {
+      return true;
+    }
+
+    return (
+      book.title.toLowerCase().includes(term) ||
+      book.author?.toLowerCase().includes(term) ||
+      book.isbn.includes(term)
+    );
+  });
+
+  const handleToggleRead = (book: Book): void => {
+    updateBookReadStatus(book.id, !book.isRead);
+    const updatedBooks = getBooks();
+
+    setBooks(updatedBooks);
+
+    const updatedBook = updatedBooks.find((item) => item.id === book.id);
+
+    setSelectedBook(updatedBook ?? null);
+  };
+
+  const handleDelete = (book: Book): void => {
+    deleteBook(book.id);
+    setBooks(getBooks());
+    setSelectedBook(null);
+  };
 
   return (
     <ErrorBoundary>
       <ScrollView contentContainerStyle={styles.container}>
         <Text>Välkomstmeddelande här!</Text>
-
-        <TextInput
-          style={styles.input}
-          onChangeText={setInput}
-          value={input}
-          placeholder="Sök efter bok eller författare..."
-        />
         <StatusBar style="auto" />
-        <Results input={input} />
         <AddBook setBooks={setBooks} />
-        <BookList books={books} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Sök titel, författare eller ISBN"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+        />
+        {selectedBook !== null ? (
+          <BookDetails
+            book={selectedBook}
+            onBack={() => setSelectedBook(null)}
+            onDelete={handleDelete}
+            onToggleRead={handleToggleRead}
+          />
+        ) : (
+          <BookList
+            books={filteredBooks}
+            setBooks={setBooks}
+            onSelectBook={setSelectedBook}
+          />
+        )}
       </ScrollView>
     </ErrorBoundary>
   );
@@ -71,30 +96,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  input: {
-    marginTop: 25,
-    height: 40,
+  searchInput: {
     width: "100%",
+    height: 45,
     borderWidth: 1,
-    padding: 10,
-  },
-
-  heading: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 30,
-    marginBottom: 15,
-  },
-
-  book: {
-    width: "100%",
-    borderWidth: 1,
-    padding: 15,
+    paddingHorizontal: 12,
+    marginTop: 20,
     marginBottom: 10,
-  },
-
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
   },
 });

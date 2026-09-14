@@ -1,26 +1,72 @@
-import { StyleSheet, Text, View } from "react-native";
-
+import type { Dispatch, SetStateAction } from "react";
+import { Button, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  deleteBook,
+  getBooks,
+  updateBookReadStatus,
+} from "../../database/database";
 import type { Book } from "../../types/Book";
 
 type BookListProps = {
   readonly books: Book[];
+  readonly setBooks: Dispatch<SetStateAction<Book[]>>;
+  readonly onSelectBook: (book: Book) => void;
 };
 
-export default function BookList({ books }: BookListProps) {
+export default function BookList({
+  books,
+  setBooks,
+  onSelectBook,
+}: BookListProps) {
+  const handleToggleRead = (book: Book): void => {
+    updateBookReadStatus(book.id, !book.isRead);
+    setBooks(getBooks());
+  };
+
+  const handleDelete = (book: Book): void => {
+    deleteBook(book.id);
+    setBooks(getBooks());
+  };
+
+  if (books.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.heading}>Mina böcker</Text>
+        <Text>Du har inga böcker ännu.</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Mina böcker</Text>
 
       {books.map((book) => (
-        <View key={book.id} style={styles.book}>
-          <Text style={styles.title}>{book.title}</Text>
-
+        <Pressable
+          key={book.id}
+          style={styles.book}
+          onPress={() => onSelectBook(book)}
+        >
+          <Pressable onPress={() => onSelectBook(book)}>
+            <Text style={styles.title}>{book.title}</Text>
+          </Pressable>
           <Text>{book.author ?? "Okänd författare"}</Text>
 
           <Text>ISBN: {book.isbn}</Text>
 
           <Text>Status: {book.status}</Text>
-        </View>
+
+          <Text style={styles.readStatus}>
+            {book.isRead ? "✓ Lästa" : "○ Oläst"}
+          </Text>
+
+          <Button
+            title={book.isRead ? "Markera som oläst" : "Markera som läst"}
+            onPress={() => handleToggleRead(book)}
+          />
+
+          <Button title="Ta bort" onPress={() => handleDelete(book)} />
+        </Pressable>
       ))}
     </View>
   );
@@ -48,5 +94,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
+    marginBottom: 5,
+  },
+
+  readStatus: {
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
