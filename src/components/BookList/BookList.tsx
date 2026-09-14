@@ -13,12 +13,14 @@ type BookListProps = {
   readonly books: Book[];
   readonly setBooks: Dispatch<SetStateAction<Book[]>>;
   readonly onSelectBook: (book: Book) => void;
+  readonly isSearching: boolean;
 };
 
 export default function BookList({
   books,
   setBooks,
   onSelectBook,
+  isSearching,
 }: BookListProps) {
   const [expandedBookId, setExpandedBookId] = useState<number | null>(null);
 
@@ -35,10 +37,14 @@ export default function BookList({
   if (books.length === 0) {
     return (
       <View style={styles.emptyState}>
-        <Text style={styles.emptyTitle}>Inga böcker ännu</Text>
+        <Text style={styles.emptyTitle}>
+          {isSearching ? "Inga träffar" : "Inga böcker ännu"}
+        </Text>
 
         <Text style={styles.emptyText}>
-          Tryck på + för att lägga till din första bok.
+          {isSearching
+            ? "Prova att söka efter en annan titel, författare eller ISBN."
+            : "Tryck på + för att lägga till din första bok."}
         </Text>
       </View>
     );

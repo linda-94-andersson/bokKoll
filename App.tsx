@@ -97,7 +97,19 @@ export default function App() {
                 value={searchTerm}
                 onChangeText={setSearchTerm}
               />
+
+              {searchTerm.length > 0 && (
+                <Pressable
+                  style={styles.clearButton}
+                  onPress={() => setSearchTerm("")}
+                  accessibilityRole="button"
+                  accessibilityLabel="Rensa sökning"
+                >
+                  <Text style={styles.clearButtonText}>×</Text>
+                </Pressable>
+              )}
             </View>
+
             {selectedBook !== null ? (
               <BookDetails
                 book={selectedBook}
@@ -110,6 +122,7 @@ export default function App() {
                 books={filteredBooks}
                 setBooks={setBooks}
                 onSelectBook={setSelectedBook}
+                isSearching={searchTerm.trim().length > 0}
               />
             )}
           </ScrollView>
@@ -195,5 +208,18 @@ const styles = StyleSheet.create({
 
   safeArea: {
     flex: 1,
+  },
+
+  clearButton: {
+    width: 28,
+    height: 28,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  clearButtonText: {
+    fontSize: 24,
+    lineHeight: 26,
+    color: "#888",
   },
 });
