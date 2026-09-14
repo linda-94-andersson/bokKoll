@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import ErrorBoundary from "./src/components/ErrorBoundary/ErrorBoundary";
-import Results from "./src/components/Results/Results";
-import AddBook from "./src/components/AddBook/AddBook";
-import BookList from "./src/components/BookList/BookList";
 import {
   initializeDatabase,
   getBooks,
   getBookByISBN,
   deleteBook,
 } from "./src/database/database";
+import { fetchBookFromGoogle } from "./src/services/googleBooks";
+import ErrorBoundary from "./src/components/ErrorBoundary/ErrorBoundary";
+import Results from "./src/components/Results/Results";
+import AddBook from "./src/components/AddBook/AddBook";
+import BookList from "./src/components/BookList/BookList";
 
 export default function App() {
   const [input, setInput] = useState<string>("");
@@ -29,6 +30,18 @@ export default function App() {
     console.log("Book found by ISBN:", book);
 
     console.log("deleteBook function:", deleteBook);
+
+    const testGoogleBooks = async (): Promise<void> => {
+      try {
+        const book = await fetchBookFromGoogle("9780140328721");
+
+        console.log("Google Books:", book);
+      } catch (error: unknown) {
+        console.error("Kunde inte hämta boken:", error);
+      }
+    };
+
+    void testGoogleBooks();
   }, []);
 
   return (
