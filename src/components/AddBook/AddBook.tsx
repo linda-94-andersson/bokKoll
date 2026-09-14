@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
-
+import { useState, Dispatch, SetStateAction } from "react";
+import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
 import { addBook, getBookByISBN, getBooks } from "../../database/database";
 import { normalizeISBN, isValidISBN } from "../../utils/isbn";
 import type { Book, NewBook } from "../../types/Book";
 
 type AddBookProps = {
-  readonly setBooks: React.Dispatch<React.SetStateAction<Book[]>>;
+  readonly setBooks: Dispatch<SetStateAction<Book[]>>;
+  readonly onClose: () => void;
 };
 
-export default function AddBook({ setBooks }: AddBookProps) {
+export default function AddBook({ setBooks, onClose }: AddBookProps) {
   const [title, setTitle] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
   const [isbn, setIsbn] = useState<string>("");
@@ -60,56 +60,78 @@ export default function AddBook({ setBooks }: AddBookProps) {
     setAuthor("");
     setIsbn("");
     setMessage("Boken har sparats!");
+    onClose();
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Lägg till bok</Text>
+    <Modal visible animationType="slide" transparent onRequestClose={onClose}>
+      <View style={styles.overlay}>
+        <View style={styles.modal}>
+          <View style={styles.header}>
+            <Text style={styles.heading}>Lägg till bok</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Titel"
-        value={title}
-        onChangeText={setTitle}
-      />
+            <Button title="×" onPress={onClose} />
+          </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Författare"
-        value={author}
-        onChangeText={setAuthor}
-      />
+          <TextInput
+            style={styles.input}
+            placeholder="Titel"
+            value={title}
+            onChangeText={setTitle}
+          />
 
-      <TextInput
-        style={styles.input}
-        placeholder="ISBN"
-        value={isbn}
-        onChangeText={setIsbn}
-        keyboardType="numeric"
-      />
+          <TextInput
+            style={styles.input}
+            placeholder="Författare"
+            value={author}
+            onChangeText={setAuthor}
+          />
 
-      <Button title="Spara bok" onPress={onAddBook} />
+          <TextInput
+            style={styles.input}
+            placeholder="ISBN"
+            value={isbn}
+            onChangeText={setIsbn}
+            keyboardType="numeric"
+          />
 
-      {Boolean(message) && <Text style={styles.message}>{message}</Text>}
-    </View>
+          <Button title="Spara bok" onPress={onAddBook} />
+
+          {Boolean(message) && <Text style={styles.message}>{message}</Text>}
+        </View>
+      </View>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: "100%",
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    padding: 20,
   },
 
-  heading: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 30,
+  modal: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 15,
   },
 
+  heading: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+
   input: {
-    height: 40,
-    width: "100%",
+    height: 45,
     borderWidth: 1,
     paddingHorizontal: 10,
     marginBottom: 15,

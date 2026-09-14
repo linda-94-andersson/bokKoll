@@ -16,6 +16,7 @@
     "react-dom": "19.2.3",
     "react-error-boundary": "^6.1.5",
     "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
     "react-native-web": "^0.21.2",
     "styled-components": "^6.5.3"
   },

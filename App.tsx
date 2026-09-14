@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import {
   deleteBook,
@@ -17,6 +25,7 @@ export default function App() {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [isAddBookVisible, setIsAddBookVisible] = useState(false);
 
   useEffect(() => {
     initializeDatabase();
@@ -60,31 +69,55 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text>Välkomstmeddelande här!</Text>
-        <StatusBar style="auto" />
-        <AddBook setBooks={setBooks} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Sök titel, författare eller ISBN"
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-        />
-        {selectedBook !== null ? (
-          <BookDetails
-            book={selectedBook}
-            onBack={() => setSelectedBook(null)}
-            onDelete={handleDelete}
-            onToggleRead={handleToggleRead}
-          />
-        ) : (
-          <BookList
-            books={filteredBooks}
-            setBooks={setBooks}
-            onSelectBook={setSelectedBook}
-          />
-        )}
-      </ScrollView>
+      <SafeAreaView style={styles.safeArea}>
+        <>
+          <ScrollView contentContainerStyle={styles.container}>
+            <View style={styles.header}>
+              <Text style={styles.heading}>Mina böcker</Text>
+
+              <Pressable
+                style={styles.addButton}
+                onPress={() => {
+                  setIsAddBookVisible(true);
+                }}
+              >
+                <Text style={styles.addButtonText}>+</Text>
+              </Pressable>
+            </View>
+
+            <StatusBar style="auto" />
+
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Sök titel, författare eller ISBN"
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+            />
+
+            {selectedBook !== null ? (
+              <BookDetails
+                book={selectedBook}
+                onBack={() => setSelectedBook(null)}
+                onDelete={handleDelete}
+                onToggleRead={handleToggleRead}
+              />
+            ) : (
+              <BookList
+                books={filteredBooks}
+                setBooks={setBooks}
+                onSelectBook={setSelectedBook}
+              />
+            )}
+          </ScrollView>
+
+          {isAddBookVisible && (
+            <AddBook
+              setBooks={setBooks}
+              onClose={() => setIsAddBookVisible(false)}
+            />
+          )}
+        </>
+      </SafeAreaView>
     </ErrorBoundary>
   );
 }
@@ -103,5 +136,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginTop: 20,
     marginBottom: 10,
+  },
+  header: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  addButton: {
+    width: 45,
+    height: 45,
+    borderRadius: 23,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 30,
+    lineHeight: 32,
+  },
+  safeArea: {
+    flex: 1,
   },
 });

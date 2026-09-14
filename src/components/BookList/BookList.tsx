@@ -39,8 +39,6 @@ export default function BookList({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Mina böcker</Text>
-
       {books.map((book) => (
         <Pressable
           key={book.id}
