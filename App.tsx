@@ -87,13 +87,17 @@ export default function App() {
 
             <StatusBar style="auto" />
 
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Sök titel, författare eller ISBN"
-              value={searchTerm}
-              onChangeText={setSearchTerm}
-            />
+            <View style={styles.searchContainer}>
+              <Text style={styles.searchIcon}>⌕</Text>
 
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Sök titel, författare eller ISBN"
+                placeholderTextColor="#999"
+                value={searchTerm}
+                onChangeText={setSearchTerm}
+              />
+            </View>
             {selectedBook !== null ? (
               <BookDetails
                 book={selectedBook}
@@ -129,25 +133,51 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  searchInput: {
+
+  searchContainer: {
     width: "100%",
-    height: 45,
+    height: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F7F7F7",
     borderWidth: 1,
-    paddingHorizontal: 12,
+    borderColor: "#E5E5E5",
+    borderRadius: 12,
+    paddingHorizontal: 14,
     marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 16,
   },
+
+  searchIcon: {
+    fontSize: 23,
+    color: "#777",
+    marginRight: 9,
+    marginTop: -2,
+  },
+
+  searchInput: {
+    flex: 1,
+    height: "100%",
+    fontSize: 15,
+    color: "#222",
+    paddingVertical: 0,
+  },
+
   header: {
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 4,
   },
+
   heading: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#171717",
+    letterSpacing: -0.5,
   },
+
   addButton: {
     width: 45,
     height: 45,
@@ -156,11 +186,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#000",
   },
+
   addButtonText: {
     color: "#fff",
     fontSize: 30,
     lineHeight: 32,
   },
+
   safeArea: {
     flex: 1,
   },

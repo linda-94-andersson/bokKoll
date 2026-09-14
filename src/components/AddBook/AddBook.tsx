@@ -1,5 +1,15 @@
-import { useState, Dispatch, SetStateAction } from "react";
-import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { addBook, getBookByISBN, getBooks } from "../../database/database";
 import { normalizeISBN, isValidISBN } from "../../utils/isbn";
 import type { Book, NewBook } from "../../types/Book";
@@ -53,53 +63,76 @@ export default function AddBook({ setBooks, onClose }: AddBookProps) {
     };
 
     addBook(newBook);
-
     setBooks(getBooks());
 
     setTitle("");
     setAuthor("");
     setIsbn("");
-    setMessage("Boken har sparats!");
+    setMessage("");
+
     onClose();
   };
 
   return (
-    <Modal visible animationType="slide" transparent onRequestClose={onClose}>
-      <View style={styles.overlay}>
-        <View style={styles.modal}>
-          <View style={styles.header}>
-            <Text style={styles.heading}>Lägg till bok</Text>
+    <Modal visible animationType="fade" transparent onRequestClose={onClose}>
+      <Pressable style={styles.overlay} onPress={onClose}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardContainer}
+        >
+          <Pressable
+            style={styles.modal}
+            onPress={(event) => event.stopPropagation()}
+          >
+            <View style={styles.header}>
+              <Text style={styles.heading}>Lägg till bok</Text>
 
-            <Button title="×" onPress={onClose} />
-          </View>
+              <Pressable
+                style={styles.closeButton}
+                onPress={onClose}
+                accessibilityRole="button"
+                accessibilityLabel="Stäng"
+              >
+                <Text style={styles.closeButtonText}>×</Text>
+              </Pressable>
+            </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Titel"
-            value={title}
-            onChangeText={setTitle}
-          />
+            <Text style={styles.label}>Titel</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="T.ex. Harry Potter och de vises sten"
+              placeholderTextColor="#999"
+              value={title}
+              onChangeText={setTitle}
+            />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Författare"
-            value={author}
-            onChangeText={setAuthor}
-          />
+            <Text style={styles.label}>Författare</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="T.ex. J.K. Rowling"
+              placeholderTextColor="#999"
+              value={author}
+              onChangeText={setAuthor}
+            />
 
-          <TextInput
-            style={styles.input}
-            placeholder="ISBN"
-            value={isbn}
-            onChangeText={setIsbn}
-            keyboardType="numeric"
-          />
+            <Text style={styles.label}>ISBN</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="978..."
+              placeholderTextColor="#999"
+              value={isbn}
+              onChangeText={setIsbn}
+              keyboardType="numeric"
+            />
 
-          <Button title="Spara bok" onPress={onAddBook} />
+            {Boolean(message) && <Text style={styles.message}>{message}</Text>}
 
-          {Boolean(message) && <Text style={styles.message}>{message}</Text>}
-        </View>
-      </View>
+            <Pressable style={styles.saveButton} onPress={onAddBook}>
+              <Text style={styles.saveButtonText}>Spara bok</Text>
+            </Pressable>
+          </Pressable>
+        </KeyboardAvoidingView>
+      </Pressable>
     </Modal>
   );
 }
@@ -112,17 +145,22 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
+  keyboardContainer: {
+    width: "100%",
+    justifyContent: "center",
+  },
+
   modal: {
     backgroundColor: "#fff",
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 12,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 15,
+    marginBottom: 20,
   },
 
   heading: {
@@ -130,14 +168,52 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  closeButtonText: {
+    fontSize: 30,
+    lineHeight: 32,
+  },
+
   input: {
-    height: 45,
+    height: 50,
+    backgroundColor: "#F7F7F7",
     borderWidth: 1,
-    paddingHorizontal: 10,
-    marginBottom: 15,
+    borderColor: "#E0E0E0",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    marginBottom: 14,
+    fontSize: 16,
   },
 
   message: {
-    marginTop: 15,
+    marginBottom: 15,
+  },
+
+  saveButton: {
+    height: 45,
+    borderRadius: 6,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000",
+  },
+
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 6,
+    color: "#333",
   },
 });
