@@ -19,6 +19,7 @@ import ErrorBoundary from "./src/components/ErrorBoundary/ErrorBoundary";
 import AddBook from "./src/components/AddBook/AddBook";
 import BookList from "./src/components/BookList/BookList";
 import BookDetails from "./src/components/BookDetails/BookDetails";
+import EditBook from "./src/components/EditBook/EditBook";
 import type { Book } from "./src/types/Book";
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isAddBookVisible, setIsAddBookVisible] = useState(false);
+  const [isEditBookVisible, setIsEditBookVisible] = useState(false);
 
   useEffect(() => {
     initializeDatabase();
@@ -65,6 +67,11 @@ export default function App() {
     deleteBook(book.id);
     setBooks(getBooks());
     setSelectedBook(null);
+  };
+
+  const handleEditBook = (book: Book): void => {
+    setSelectedBook(book);
+    setIsEditBookVisible(true);
   };
 
   return (
@@ -116,6 +123,7 @@ export default function App() {
                 onBack={() => setSelectedBook(null)}
                 onDelete={handleDelete}
                 onToggleRead={handleToggleRead}
+                onEdit={handleEditBook}
               />
             ) : (
               <BookList
@@ -123,6 +131,7 @@ export default function App() {
                 setBooks={setBooks}
                 onSelectBook={setSelectedBook}
                 isSearching={searchTerm.trim().length > 0}
+                onEditBook={handleEditBook}
               />
             )}
           </ScrollView>
@@ -131,6 +140,17 @@ export default function App() {
             <AddBook
               setBooks={setBooks}
               onClose={() => setIsAddBookVisible(false)}
+            />
+          )}
+
+          {isEditBookVisible && selectedBook !== null && (
+            <EditBook
+              book={selectedBook}
+              setBooks={setBooks}
+              onClose={() => setIsEditBookVisible(false)}
+              onSaved={(updatedBook) => {
+                setSelectedBook(updatedBook);
+              }}
             />
           )}
         </>

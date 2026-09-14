@@ -7,6 +7,7 @@ type BookDetailsProps = {
   readonly onBack: () => void;
   readonly onDelete: (book: Book) => void;
   readonly onToggleRead: (book: Book) => void;
+  readonly onEdit: (book: Book) => void;
 };
 
 export default function BookDetails({
@@ -14,6 +15,7 @@ export default function BookDetails({
   onBack,
   onDelete,
   onToggleRead,
+  onEdit,
 }: BookDetailsProps) {
   return (
     <View style={styles.container}>
@@ -81,6 +83,9 @@ export default function BookDetails({
       )}
 
       <View style={styles.actions}>
+        <Pressable style={styles.secondaryButton} onPress={() => onEdit(book)}>
+          <Text style={styles.secondaryButtonText}>Redigera bok</Text>
+        </Pressable>
         <Pressable
           style={styles.primaryButton}
           onPress={() => onToggleRead(book)}
@@ -250,5 +255,19 @@ const styles = StyleSheet.create({
   coverContainer: {
     alignItems: "center",
     marginBottom: 24,
+  },
+
+  secondaryButton: {
+    height: 46,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EFEFEF",
+  },
+
+  secondaryButtonText: {
+    color: "#333",
+    fontSize: 15,
+    fontWeight: "600",
   },
 });

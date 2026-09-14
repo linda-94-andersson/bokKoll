@@ -14,6 +14,7 @@ type BookListProps = {
   readonly setBooks: Dispatch<SetStateAction<Book[]>>;
   readonly onSelectBook: (book: Book) => void;
   readonly isSearching: boolean;
+  readonly onEditBook: (book: Book) => void;
 };
 
 export default function BookList({
@@ -21,6 +22,7 @@ export default function BookList({
   setBooks,
   onSelectBook,
   isSearching,
+  onEditBook,
 }: BookListProps) {
   const [expandedBookId, setExpandedBookId] = useState<number | null>(null);
 
@@ -98,6 +100,23 @@ export default function BookList({
                 </Text>
               </Pressable>
 
+              {isExpanded && (
+                <>
+                  <Pressable
+                    style={styles.editButton}
+                    onPress={() => onEditBook(book)}
+                  >
+                    <Text style={styles.editText}>Redigera</Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={styles.deleteButton}
+                    onPress={() => handleDelete(book)}
+                  >
+                    <Text style={styles.deleteText}>Ta bort</Text>
+                  </Pressable>
+                </>
+              )}
               <Pressable
                 style={styles.actionButton}
                 onPress={() => setExpandedBookId(isExpanded ? null : book.id)}
@@ -106,15 +125,6 @@ export default function BookList({
                   {isExpanded ? "Mindre" : "Mer"}
                 </Text>
               </Pressable>
-
-              {isExpanded && (
-                <Pressable
-                  style={styles.deleteButton}
-                  onPress={() => handleDelete(book)}
-                >
-                  <Text style={styles.deleteText}>Ta bort</Text>
-                </Pressable>
-              )}
             </View>
           </View>
         );
@@ -256,5 +266,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#777",
     textAlign: "center",
+  },
+
+  editButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 11,
+    borderRadius: 8,
+    backgroundColor: "#EDEDED",
+  },
+
+  editText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#333",
   },
 });

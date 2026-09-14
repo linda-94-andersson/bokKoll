@@ -158,4 +158,30 @@ export function searchBooks(searchTerm: string): Book[] {
   );
 }
 
+export function updateBook(id: number, book: NewBook): void {
+  db.runSync(
+    `UPDATE books
+     SET isbn = ?,
+         title = ?,
+         author = ?,
+         coverUrl = ?,
+         description = ?,
+         publishedYear = ?,
+         status = ?,
+         isRead = ?
+     WHERE id = ?`,
+    [
+      book.isbn,
+      book.title,
+      book.author,
+      book.coverUrl,
+      book.description,
+      book.publishedYear,
+      book.status,
+      book.isRead ? 1 : 0,
+      id,
+    ],
+  );
+}
+
 export default db;
